@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -12,10 +12,10 @@ const transporter = nodemailer.createTransport({
 async function sendOrderMail(order) {
     await transporter.sendMail({
         from: `"Netget" <${process.env.SMTP_USER}>`,
-        to: process.env.,
+        to: process.env.RECEIVER_EMAIL,
         subject: "Új megrendelés",
         text: `Új megrendelés érkezett: ${JSON.stringify(order)}`,
     });
 }
 
-module.exports = { sendOrderMail };
+export default sendOrderMail;

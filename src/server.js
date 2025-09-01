@@ -1,46 +1,31 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { appendOrder } from "./services/googleSheets.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+import router from "./routes/orders.js";
+dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
-app.use(express.static("public")); // frontend kiszolgálás
+app.use(bodyParser.urlencoded({ extended: true })); // Add this to parse form data
+app.use(express.static("public")); // Serve frontend files
 
-// Node.js __dirname pótlás ESM-ben
+// Node.js __dirname replacement in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Google Sheet azonosító
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
-
-// Dummy login (csak MVP-re)
+// Dummy login (for MVP)
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
     if (username === process.env.USER && process.env.PWD) {
-        return res.json({ success: true, token: "fake-jwt-token" });
+        const token = jwt.sign({ username }, "asdfasdf", { expiresIn: "1h" });
+        return res.json({ success: true, token });
     }
     return res.status(401).json({ success: false, message: "Invalid credentials" });
 });
 
-// Megrendelés endpoint
-app.post("/order", async (req, res) => {
-    try {
-        const { customerName, description, date } = req.body;
-
-        await appendOrder(SPREADSHEET_ID, [
-            new Date().toISOString(),
-            customerName,
-            description,
-            date,
-        ]);
-
-        res.status(200).json({ message: "Order saved to Google Sheets" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to save order" });
-    }
-});
+// Orders endpoint
+app.use("/order", router);
 
 export default app;

@@ -28,21 +28,39 @@ loginForm.addEventListener("submit", async (e) => {
 
 orderForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const customerName = document.getElementById("customerName").value;
-    const description = document.getElementById("description").value;
-    const date = document.getElementById("date").value;
+    console.log("Form submitted");
 
-    const res = await fetch("/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerName, description, date }),
-    });
+    const customerName = document.getElementById("customerName");
+    const description = document.getElementById("description");
+    const date = document.getElementById("date");
 
-    const data = await res.json();
-    if (res.ok) {
-        alert("Megrendelés rögzítve!");
-        orderForm.reset();
+    console.log("Customer Name:", customerName ? customerName.value : "Not found");
+    console.log("Description:", description ? description.value : "Not found");
+    console.log("Date:", date ? date.value : "Not found");
+
+    // Proceed with the fetch request if all fields are valid
+    if (customerName && description && date) {
+        const res = await fetch("/order", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`, // Include the token here
+            },
+            body: JSON.stringify({
+                customerName: customerName.value,
+                description: description.value,
+                actualDate: date.value,
+            }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            alert("Megrendelés rögzítve!");
+            orderForm.reset();
+        } else {
+            alert("Hiba: " + data.error);
+        }
     } else {
-        alert("Hiba: " + data.error);
+        alert("Hiba: Hiányzó mezők!");
     }
 });

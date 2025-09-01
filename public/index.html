@@ -14,10 +14,26 @@
 
 <div id="orderSection" style="display:none;">
     <h2>Új megrendelés</h2>
-    <form id="orderForm">
-        <input type="text" id="customerName" placeholder="Megrendelő neve" required>
-        <input type="text" id="description" placeholder="Leírás" required>
-        <input type="date" id="date" required>
+    <form id="orderForm" action="/order" method="POST">
+        <input type="text" name="mlpsz" placeholder="Mlpsz." required>
+        <input type="date" id="date" name="actualDate" placeholder="Tényleges dátum" required>
+        <input type="date" name="orderDate" placeholder="Megbízás dátum" required>
+        <input type="text" id="customerName" name="customerName" placeholder="Vásárló neve" required>
+        <input type="text" name="phone" placeholder="Telefonszám" required>
+        <input type="text" name="address" placeholder="Cím" required>
+        <input type="text" id="description" name="description" placeholder="Megnevezés" required>
+        <input type="text" name="type" placeholder="Típus" required>
+        <input type="text" name="manufacturer" placeholder="Gyártó" required>
+        <textarea name="errorDescription" placeholder="Hiba leírása" required></textarea>
+        <input type="date" name="purchaseDate" placeholder="Vásárlás dátuma" required>
+        <input type="text" name="orderNumber" placeholder="Rendelésszám" required>
+        <input type="text" name="productId" placeholder="Termék ID" required>
+        <input type="text" name="factoryNumber" placeholder="Gyári szám" required>
+        <input type="text" name="serialNumber" placeholder="Szériaszám" required>
+        <textarea name="note" placeholder="Megjegyzés"></textarea>
+        <input type="text" name="status" placeholder="Státusz" required>
+        <input type="text" name="technician" placeholder="Szerelő" required>
+        <input type="text" name="invoice" placeholder="Számla" required>
         <button type="submit">Mentés</button>
     </form>
 </div>
