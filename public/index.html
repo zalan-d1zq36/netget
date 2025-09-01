@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>MVP rendeléskezelő</title>
+</head>
+<body>
+<h1>Bejelentkezés</h1>
+<form id="loginForm">
+    <input type="text" id="username" placeholder="Felhasználónév" required>
+    <input type="password" id="password" placeholder="Jelszó" required>
+    <button type="submit">Belépés</button>
+</form>
+
+<div id="orderSection" style="display:none;">
+    <h2>Új megrendelés</h2>
+    <form id="orderForm">
+        <input type="text" id="customerName" placeholder="Megrendelő neve" required>
+        <input type="text" id="description" placeholder="Leírás" required>
+        <input type="date" id="date" required>
+        <button type="submit">Mentés</button>
+    </form>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
