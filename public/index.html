@@ -1,31 +1,53 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <title>MVP rendeléskezelő</title>
+  <meta charset="UTF-8">
+  <title>Netget Rendeléskezelő</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Bejelentkezés</h1>
-<form id="loginForm">
-    <input type="text" id="username" placeholder="Felhasználónév" required>
-    <input type="password" id="password" placeholder="Jelszó" required>
-    <button type="submit">Belépés</button>
-</form>
+  <!-- Fejléc -->
+  <header>
+    <div class="logo-container">
+      <img src="netget.png" alt="Netget logó" class="logo">
+      <span class="company">Netget Szerviz</span>
+    </div>
+    <nav>
+      <ul id="menu">
+        <li><a href="#" data-section="loginSection">Bejelentkezés</a></li>
+        <li><a href="#" data-section="orderSection" style="display:none;">Új megrendelés</a></li>
+        <li><a href="#" data-section="databaseSection" style="display:none;">Adatbázis</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Tartalom -->
+  <main>
+    <!-- Login -->
+    <section id="loginSection" class="centered">
+      <img src="netget.png" alt="Netget logó" class="big-logo">
+      <h2>Bejelentkezés</h2>
+      <form id="loginForm" class="card">
+        <input type="text" id="username" placeholder="Felhasználónév" required>
+        <input type="password" id="password" placeholder="Jelszó" required>
+        <button type="submit">Belépés</button>
+      </form>
+    </section>
 
 <div id="orderSection" style="display:none;">
     <h2>Új megrendelés</h2>
     <form id="orderForm" action="/order" method="POST">
         <input type="text" name="mlpsz" placeholder="Mlpsz." required>
-        <input type="date" id="date" name="actualDate" placeholder="Tényleges dátum" required>
-        <input type="date" name="orderDate" placeholder="Megbízás dátum" required>
-        <input type="text" id="customerName" name="customerName" placeholder="Vásárló neve" required>
+        <input type="date" name="actualDate" required>
+        <input type="date" name="orderDate" required>
+        <input type="text" name="customerName" placeholder="Vásárló neve" required>
         <input type="text" name="phone" placeholder="Telefonszám" required>
         <input type="text" name="address" placeholder="Cím" required>
-        <input type="text" id="description" name="description" placeholder="Megnevezés" required>
+        <input type="text" name="description" placeholder="Megnevezés" required>
         <input type="text" name="type" placeholder="Típus" required>
         <input type="text" name="manufacturer" placeholder="Gyártó" required>
         <textarea name="errorDescription" placeholder="Hiba leírása" required></textarea>
-        <input type="date" name="purchaseDate" placeholder="Vásárlás dátuma" required>
+        <input type="date" name="purchaseDate" required>
         <input type="text" name="orderNumber" placeholder="Rendelésszám" required>
         <input type="text" name="productId" placeholder="Termék ID" required>
         <input type="text" name="factoryNumber" placeholder="Gyári szám" required>
@@ -35,9 +57,22 @@
         <input type="text" name="technician" placeholder="Szerelő" required>
         <input type="text" name="invoice" placeholder="Számla" required>
         <button type="submit">Mentés</button>
-    </form>
-</div>
+      </form>
+    </section>
 
-<script src="app.js"></script>
+    <!-- Rendelések listázása -->
+    <section id="databaseSection" style="display:none;">
+      <h2>Rendelések</h2>
+      <div class="card">
+        <p>Itt fog majd megjelenni a rendeléslista.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Netget Szerviz</p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>

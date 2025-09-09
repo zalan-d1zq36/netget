@@ -63,14 +63,27 @@ export async function appendOrder(order) {
         order.invoice,
     ];
 
+    console.log("Inserting order:", values); // Add this line for debugging
+
     return new Promise((resolve, reject) => {
         db.run(query, values, function (err) {
             if (err) {
-                console.error("Failed to save order:", err);
+                console.error("Failed to save order:", err); // Log the error
                 reject(err);
             } else {
-                console.log("Order saved to SQLite database");
+                console.log("Order saved to SQLite database with ID:", this.lastID); // Log success
                 resolve(this.lastID); // Return the ID of the inserted row
+            }
+        });
+    });
+}
+export function getAllOrders() {
+    return new Promise((resolve, reject) => {
+        db.all("SELECT * FROM orders", [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
             }
         });
     });

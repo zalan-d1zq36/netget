@@ -1,26 +1,55 @@
 const loginForm = document.getElementById("loginForm");
 const orderForm = document.getElementById("orderForm");
 const orderSection = document.getElementById("orderSection");
+const databaseSection = document.getElementById("databaseSection");
 
 let token = null;
+let userEmail = null; // Store logged-in user's email
+
+document.querySelectorAll("#menu a").forEach(link => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const sectionId = e.target.dataset.section;
+    document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
+    document.getElementById(sectionId).style.display = "block";
+
+    if (sectionId === "databaseSection") {
+      // Only load orders if admin
+      if (userEmail === "admin") {
+        loadOrders();
+      } else {
+        databaseSection.innerHTML = "<p>Nincs jogosultság a rendelések megtekintéséhez.</p>";
+      }
+    }
+  });
+});
 
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const username = document.getElementById("username").value;
+    const email = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const res = await fetch("/login", {
+    const res = await fetch("/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
     if (data.success) {
         token = data.token;
+        userEmail = email; // Save the logged-in user's email
         alert("Sikeres belépés!");
         loginForm.style.display = "none";
         orderSection.style.display = "block";
+        // Menü frissítése
+        document.querySelector('[data-section="orderSection"]').style.display = "inline";
+        // Only show orders menu for admin
+        if (userEmail === "admin") {
+          document.querySelector('[data-section="databaseSection"]').style.display = "inline";
+        } else {
+          document.querySelector('[data-section="databaseSection"]').style.display = "none";
+        }
     } else {
         alert("Hibás belépési adatok!");
     }
@@ -28,39 +57,84 @@ loginForm.addEventListener("submit", async (e) => {
 
 orderForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("Form submitted");
 
-    const customerName = document.getElementById("customerName");
-    const description = document.getElementById("description");
-    const date = document.getElementById("date");
+    const formData = new FormData(orderForm);
+    const order = Object.fromEntries(formData.entries());
 
-    console.log("Customer Name:", customerName ? customerName.value : "Not found");
-    console.log("Description:", description ? description.value : "Not found");
-    console.log("Date:", date ? date.value : "Not found");
+    const res = await fetch("/order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(order),
+    });
 
-    // Proceed with the fetch request if all fields are valid
-    if (customerName && description && date) {
-        const res = await fetch("/order", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`, // Include the token here
-            },
-            body: JSON.stringify({
-                customerName: customerName.value,
-                description: description.value,
-                actualDate: date.value,
-            }),
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-            alert("Megrendelés rögzítve!");
-            orderForm.reset();
-        } else {
-            alert("Hiba: " + data.error);
-        }
+    if (res.ok) {
+        alert("Megrendelés rögzítve!");
+        orderForm.reset();
+        if (userEmail === "admin") loadOrders();
     } else {
-        alert("Hiba: Hiányzó mezők!");
+        const text = await res.text();
+        alert("Hiba: " + text);
     }
 });
+
+async function loadOrders() {
+  if (userEmail !== "admin") {
+    ordersSection.innerHTML = "<p>Nincs jogosultság a rendelések megtekintéséhez.</p>";
+    return;
+  }
+  const res = await fetch("/orders", {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    ordersSection.innerHTML = "<p>Nem sikerült betölteni a rendeléseket.</p>";
+    return;
+  }
+
+  const orders = await res.json();
+  renderOrders(orders);
+}
+
+function renderOrders(orders) {
+  const container = document.querySelector("#databaseSection");
+  container.innerHTML = "<h2>Rendelések</h2>";
+
+  if (orders.length === 0) {
+    container.innerHTML += "<p>Nincsenek rendelések.</p>";
+    return;
+  }
+
+  let table = `
+    <table border="1" cellpadding="6" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Vásárló</th>
+          <th>Telefon</th>
+          <th>Cím</th>
+          <th>Megnevezés</th>
+          <th>Státusz</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  orders.forEach(o => {
+    table += `
+      <tr>
+        <td>${o.id || ""}</td>
+        <td>${o.customerName || ""}</td>
+        <td>${o.phone || ""}</td>
+        <td>${o.address || ""}</td>
+        <td>${o.description || ""}</td>
+        <td>${o.status || ""}</td>
+      </tr>
+    `;
+  });
+
+  table += "</tbody></table>";
+  container.innerHTML += table;
+}
