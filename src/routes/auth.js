@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 const authRouter = express.Router();
 const SECRET = process.env.JWT_SECRET;
 console.log(SECRET);
-// Use credentials from .env
 const users = [
     { id: 1, email: process.env.USERNAME, password: process.env.PASSWORD }
 ];

@@ -9,7 +9,7 @@ const db = new sqlite3.Database(dbPath);
 db.run(`
     CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        mlpsz TEXT,
+        clientName TEXT,
         actualDate TEXT,
         orderDate TEXT,
         customerName TEXT,
@@ -35,14 +35,14 @@ db.run(`
 export async function appendOrder(order) {
     const query = `
         INSERT INTO orders (
-            mlpsz, actualDate, orderDate, customerName, phone, address, description,
+            clientName, actualDate, orderDate, customerName, phone, address, description,
             type, manufacturer, errorDescription, purchaseDate, orderNumber,
             productId, factoryNumber, serialNumber, note, status, technician, invoice
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-        order.mlpsz,
+        order.clientName,
         order.actualDate,
         order.orderDate,
         order.customerName,

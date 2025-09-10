@@ -14,8 +14,7 @@ document.querySelectorAll("#menu a").forEach(link => {
     document.getElementById(sectionId).style.display = "block";
 
     if (sectionId === "databaseSection") {
-      // Only load orders if admin
-      if (userEmail === "admin") {
+      if (userEmail === process.env.USERNAME) {
         loadOrders();
       } else {
         databaseSection.innerHTML = "<p>Nincs jogosultság a rendelések megtekintéséhez.</p>";
@@ -44,8 +43,7 @@ loginForm.addEventListener("submit", async (e) => {
         orderSection.style.display = "block";
         // Menü frissítése
         document.querySelector('[data-section="orderSection"]').style.display = "inline";
-        // Only show orders menu for admin
-        if (userEmail === "admin") {
+        if (userEmail === process.env.USERNAME) {
           document.querySelector('[data-section="databaseSection"]').style.display = "inline";
         } else {
           document.querySelector('[data-section="databaseSection"]').style.display = "none";
@@ -61,6 +59,8 @@ orderForm.addEventListener("submit", async (e) => {
     const formData = new FormData(orderForm);
     const order = Object.fromEntries(formData.entries());
 
+    order.actualDate = new Date().toISOString().slice(0, 10);
+
     const res = await fetch("/order", {
         method: "POST",
         headers: {
@@ -73,7 +73,7 @@ orderForm.addEventListener("submit", async (e) => {
     if (res.ok) {
         alert("Megrendelés rögzítve!");
         orderForm.reset();
-        if (userEmail === "admin") loadOrders();
+        if (userEmail === process.env.USERNAME) loadOrders();
     } else {
         const text = await res.text();
         alert("Hiba: " + text);
@@ -81,16 +81,16 @@ orderForm.addEventListener("submit", async (e) => {
 });
 
 async function loadOrders() {
-  if (userEmail !== "admin") {
-    ordersSection.innerHTML = "<p>Nincs jogosultság a rendelések megtekintéséhez.</p>";
+  if (userEmail !== process.env.USERNAME) {
+    databaseSection.innerHTML = "<p>Nincs jogosultság a rendelések megtekintéséhez.</p>";
     return;
   }
-  const res = await fetch("/orders", {
+  const res = await fetch("/order", {
     headers: { "Authorization": `Bearer ${token}` }
   });
 
   if (!res.ok) {
-    ordersSection.innerHTML = "<p>Nem sikerült betölteni a rendeléseket.</p>";
+    databaseSection.innerHTML = "<p>Nem sikerült betölteni a rendeléseket.</p>";
     return;
   }
 
@@ -102,39 +102,33 @@ function renderOrders(orders) {
   const container = document.querySelector("#databaseSection");
   container.innerHTML = "<h2>Rendelések</h2>";
 
-  if (orders.length === 0) {
+  if (!orders || orders.length === 0) {
     container.innerHTML += "<p>Nincsenek rendelések.</p>";
     return;
   }
 
+  // Get all column names from the first order
+  const columns = Object.keys(orders[0]);
+
   let table = `
-    <table border="1" cellpadding="6" cellspacing="0">
+    <div class="card">
+    <table border="1" cellpadding="6" cellspacing="0" style="width:100%;">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Vásárló</th>
-          <th>Telefon</th>
-          <th>Cím</th>
-          <th>Megnevezés</th>
-          <th>Státusz</th>
+          ${columns.map(col => `<th>${col}</th>`).join("")}
         </tr>
       </thead>
       <tbody>
   `;
 
-  orders.forEach(o => {
+  orders.forEach(order => {
     table += `
       <tr>
-        <td>${o.id || ""}</td>
-        <td>${o.customerName || ""}</td>
-        <td>${o.phone || ""}</td>
-        <td>${o.address || ""}</td>
-        <td>${o.description || ""}</td>
-        <td>${o.status || ""}</td>
+        ${columns.map(col => `<td>${order[col] ?? ""}</td>`).join("")}
       </tr>
     `;
   });
 
-  table += "</tbody></table>";
+  table += "</tbody></table></div>";
   container.innerHTML += table;
 }

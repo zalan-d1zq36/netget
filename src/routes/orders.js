@@ -1,7 +1,6 @@
 import express from "express";
 import { authMiddleware } from "./auth.js"; // Import the shared middleware
-import { appendOrder } from "../services/sqliteStorage.js";
-import sendOrderMail from "../services/mailer.js";
+import { appendOrder, getAllOrders } from "../services/sqliteStorage.js";
 
 const OrderRouter = express.Router();
 
