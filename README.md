@@ -222,7 +222,7 @@ netget/
 
 ## Licenc
 
-Ez a projekt a Netget Szerviz tulajdonában lévő szoftver.
+Ez a projekt a Netget Kft. tulajdonában lévő szoftver.
 
 ## Támogatás
 
