@@ -63,28 +63,121 @@ export async function appendOrder(order) {
         order.invoice,
     ];
 
-    console.log("Inserting order:", values); // Add this line for debugging
-
     return new Promise((resolve, reject) => {
         db.run(query, values, function (err) {
             if (err) {
-                console.error("Failed to save order:", err); // Log the error
-                reject(err);
+                console.error("Database error - failed to save order:", err.message);
+                reject(new Error('Database operation failed'));
             } else {
-                console.log("Order saved to SQLite database with ID:", this.lastID); // Log success
                 resolve(this.lastID); // Return the ID of the inserted row
             }
         });
     });
 }
-export function getAllOrders() {
+export function getAllOrders(page = 1, limit = 20) {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM orders", [], (err, rows) => {
+        const offset = (page - 1) * limit;
+        
+        // Get total count
+        db.get("SELECT COUNT(*) as total FROM orders", [], (err, countResult) => {
             if (err) {
                 reject(err);
+                return;
+            }
+            
+            const total = countResult.total;
+            const totalPages = Math.ceil(total / limit);
+            
+            // Get paginated results
+            db.all(
+                "SELECT * FROM orders ORDER BY id LIMIT ? OFFSET ?",
+                [limit, offset],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({
+                            orders: rows,
+                            pagination: {
+                                page: page,
+                                limit: limit,
+                                total: total,
+                                totalPages: totalPages,
+                                hasNext: page < totalPages,
+                                hasPrev: page > 1
+                            }
+                        });
+                    }
+                }
+            );
+        });
+    });
+}
+
+// Get single order by ID
+export function getOrderById(id) {
+    return new Promise((resolve, reject) => {
+        const query = "SELECT * FROM orders WHERE id = ?";
+        
+        db.get(query, [id], (err, row) => {
+            if (err) {
+                console.error("Database error - failed to get order:", err.message);
+                reject(new Error('Database operation failed'));
             } else {
-                resolve(rows);
+                resolve(row || null); // Return null if no order found
             }
         });
     });
 }
+
+// Update specific fields of an order
+export function updateOrder(id, updates) {
+    return new Promise((resolve, reject) => {
+        const fields = Object.keys(updates);
+        const values = Object.values(updates);
+        const setClause = fields.map(field => `${field} = ?`).join(', ');
+        
+        const query = `UPDATE orders SET ${setClause} WHERE id = ?`;
+        values.push(id);
+        
+        db.run(query, values, function(err) {
+            if (err) {
+                console.error("Database error - failed to update order:", err.message);
+                reject(new Error('Database operation failed'));
+            } else if (this.changes === 0) {
+                reject(new Error('Order not found'));
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+}
+
+// Delete an order by ID
+export function deleteOrder(id) {
+    return new Promise((resolve, reject) => {
+        const query = "DELETE FROM orders WHERE id = ?";
+        
+        db.run(query, [id], function(err) {
+            if (err) {
+                console.error("Database error - failed to delete order:", err.message);
+                reject(new Error('Database operation failed'));
+            } else if (this.changes === 0) {
+                reject(new Error('Order not found'));
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+}
+
+// Export as default object for easier importing
+const sqliteStorage = {
+    appendOrder,
+    getAllOrders,
+    getOrderById,
+    updateOrder,
+    deleteOrder
+};
+
+export default sqliteStorage;

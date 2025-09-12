@@ -13,6 +13,15 @@ yarn-error.log*
 *.cert
 service-account.json
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Credentials and sensitive data
+credentials.json
+orders.db
+
 # Build output
 dist/
 build/

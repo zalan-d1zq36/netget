@@ -1,43 +1,101 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import fs from "fs";
+import path from "path";
+import config from "../config.js";
+import { secureLog } from "../utils/security.js";
 
 const authRouter = express.Router();
-const SECRET = process.env.JWT_SECRET;
-console.log(SECRET);
-const users = [
-    { id: 1, email: process.env.USERNAME, password: process.env.PASSWORD }
-];
-console.log(`[AUTH] Loaded users: ${users.map(u => u.email).join(", ")}`);
 
-authRouter.post("/login", (req, res) => {
-    const { email, password } = req.body;
-    console.log(`[LOGIN] Attempt: email=${email}, password=${password}`);
-    const user = users.find(u => u.email === email && u.password === password);
-    if (!user) {
-        console.log("[LOGIN] Failed: Invalid credentials");
-        return res.status(401).json({ error: "Hibás adatok" });
+// Load users from credentials.json
+let credentials;
+try {
+    const credentialsPath = path.join(process.cwd(), 'credentials.json');
+    const credentialsData = fs.readFileSync(credentialsPath, 'utf8');
+    credentials = JSON.parse(credentialsData);
+    secureLog('info', 'Credentials loaded successfully', { usersCount: credentials.users.length });
+} catch (error) {
+    secureLog('error', 'Failed to load credentials.json', { error: error.message });
+    throw new Error('Authentication system initialization failed');
+}
+
+const users = credentials.users.filter(user => user.active);
+
+authRouter.post("/login", async (req, res) => {
+    const clientIP = req.ip || req.connection.remoteAddress;
+    try {
+        const { email, password } = req.body;
+        
+        // Input validation
+        if (!email || !password) {
+            secureLog('warn', 'Login attempt with missing credentials', { ip: clientIP });
+            return res.status(400).json({ error: "Email és jelszó megadása kötelező" });
+        }
+        
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            secureLog('warn', 'Login attempt with invalid email', { email, ip: clientIP });
+            return res.status(401).json({ error: "Hibás adatok" });
+        }
+        
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+            secureLog('warn', 'Login attempt with invalid password', { email, ip: clientIP });
+            return res.status(401).json({ error: "Hibás adatok" });
+        }
+
+        const token = jwt.sign({ 
+            id: user.id, 
+            email: user.email, 
+            role: user.role,
+            name: user.name 
+        }, config.JWT_SECRET, { expiresIn: "1h" });
+        
+        secureLog('info', 'Successful login', { userId: user.id, email: user.email, ip: clientIP });
+        res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role, name: user.name } });
+    } catch (error) {
+        secureLog('error', 'Login error', { error: error.message, ip: clientIP });
+        res.status(500).json({ error: "Szerver hiba" });
     }
-
-    const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: "1h" });
-    console.log(`[LOGIN] Success: email=${email}, token=${token}`);
-    res.json({ success: true, token });
 });
+
+// Role checking helper functions
+export function hasRole(user, role) {
+    return user && user.role === role;
+}
+
+export function hasPermission(user, permission) {
+    if (!user || !user.role) return false;
+    const roleConfig = credentials.roles[user.role];
+    return roleConfig && roleConfig.permissions.includes(permission);
+}
+
+export function requireRole(role) {
+    return (req, res, next) => {
+        if (!req.user || !hasRole(req.user, role)) {
+            return res.status(403).json({ message: "Insufficient permissions" });
+        }
+        next();
+    };
+}
+
+export function requirePermission(permission) {
+    return (req, res, next) => {
+        if (!req.user || !hasPermission(req.user, permission)) {
+            return res.status(403).json({ message: "Insufficient permissions" });
+        }
+        next();
+    };
+}
 
 export function authMiddleware(req, res, next) {
     const authHeader = req.headers["authorization"];
-    console.log(`[AUTH] Header: ${authHeader}`);
     const token = authHeader && authHeader.split(" ")[1];
-    if (!token) {
-        console.log("[AUTH] Failed: No token provided");
-        return res.sendStatus(401);
-    }
+    if (!token) return res.sendStatus(401);
 
-    jwt.verify(token, SECRET, (err, user) => {
-        if (err) {
-            console.log("[AUTH] Failed: Invalid token", err);
-            return res.sendStatus(403);
-        }
-        console.log(`[AUTH] Success: User ${JSON.stringify(user)}`);
+    jwt.verify(token, config.JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
         req.user = user;
         next();
     });

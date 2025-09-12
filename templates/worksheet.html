@@ -1,0 +1,94 @@
+<table style="border:2px solid #000; border-collapse:collapse; width:100%; font-size:11px;">
+  <!-- Első sor: Megrendelő és Ügyfél adatai -->
+  <tr>
+    <td style="border:1px solid #000; padding:6px; width:50%; height:120px; vertical-align:top;">
+      <strong>Megrendelő:</strong><br>
+      <strong>Név:</strong> Netget Kft.,<br>
+      <strong>Cím:</strong> 1135 Budapest, Tatai u. 68.<br>
+      <strong>E-mail:</strong> info@netget.hu
+    </td>
+    <td style="border:1px solid #000; padding:6px; width:50%; height:120px; vertical-align:top;">
+      <strong>Ügyfél adatai:</strong><br>
+      <strong>Név:</strong> {{customerName}}<br>
+      <strong>Cím:</strong> {{address}}<br>
+      <strong>Telefonszám:</strong> {{phone}}
+    </td>
+  </tr>
+  
+  <!-- Második sor: Készülék adatok és Bejelentett hiba -->
+  <tr>
+    <td style="border:1px solid #000; padding:6px; height:80px; vertical-align:top;">
+      <strong>Készülék adatai:</strong><br>
+      <strong>Típus:</strong> {{type}}<br>
+      <strong>Gyártó:</strong> {{manufacturer}}<br>
+      <strong>Megnevezés:</strong> {{description}}
+    </td>
+    <td style="border:1px solid #000; padding:6px; height:80px; vertical-align:top;">
+      <strong>Bejelentett hiba:</strong><br>
+      {{errorDescription}}
+    </td>
+  </tr>
+  
+  <!-- Harmadik sor: Bevizsgálás/javítás dátuma és Elszállítás -->
+  <tr>
+    <td style="border:1px solid #000; padding:6px; height:60px; vertical-align:top;">
+      <strong>Bevizsgálás/javítás dátuma:</strong>
+    </td>
+    <td style="border:1px solid #000; padding:6px; height:60px; vertical-align:top;">
+      <strong>Elszállítás esetén - dátum:</strong><br><br>
+      <strong>Tartozékok:</strong><br><br>
+      <strong>Állapot (hibák, sérülések, hiányosságok):</strong>
+    </td>
+  </tr>
+  
+  <!-- Negyedik sor: Elvégzett javítás és Aláírások + Visszaszállítás adatok -->
+  <tr>
+    <td style="border:1px solid #000; padding:6px; height:100px; vertical-align:top;">
+      <strong>Elvégzett javítás, (beépített alkatrészek):</strong>
+    </td>
+    <td style="border:1px solid #000; padding:6px; height:100px; vertical-align:top;">
+      <table style="width:100%; border:none; border-collapse:separate;">
+        <tr>
+          <td style="width:50%; text-align:center; border:none; padding:2px;"><strong>Átadó (ügyfél) aláírása</strong></td>
+          <td style="width:50%; text-align:center; border:none; padding:2px;"><strong>Átvevő (szerviz) aláírása</strong></td>
+        </tr>
+        <tr>
+          <td style="height:25px; border:none; padding:0;"></td>
+          <td style="height:25px; border:none; padding:0;"></td>
+        </tr>
+      </table>
+      <strong>Visszaszállítás dátuma:</strong><br><br>
+      <strong>Tartozékok:</strong><br><br>
+      <strong>Állapot (hibák, sérülések, hiányosságok):</strong>
+    </td>
+  </tr>
+  
+  <!-- Ötödik sor: Bevizsgálási eredmény és Elvégzett javítás -->
+  <tr>
+    <td style="border:1px solid #000; padding:6px; height:100px; vertical-align:top;">
+      <strong>Bevizsgálási eredmény:</strong>
+    </td>
+    <td style="border:1px solid #000; padding:6px; height:100px; vertical-align:top;">
+      <strong>Elvégzett javítás, (beépített alkatrészek):</strong><br><br><br>
+      <strong>Javaslat, vélemény:</strong>
+    </td>
+  </tr>
+  
+  <!-- Utolsó sor: Aláírások -->
+  <tr>
+    <td style="border:1px solid #000; padding:6px; text-align:center; height:50px; vertical-align:bottom;">
+      <strong>Ügyfél aláírása</strong>
+    </td>
+    <td style="border:1px solid #000; padding:6px; text-align:center; height:50px; vertical-align:bottom;">
+      <strong>Szerviz aláírása</strong>
+    </td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #000; padding:6px; text-align:center; height:50px; vertical-align:bottom;">
+      <strong>Átadó (ügyfél) aláírása</strong>
+    </td>
+    <td style="border:1px solid #000; padding:6px; text-align:center; height:50px; vertical-align:bottom;">
+      <strong>Átvevő (szerviz) aláírása</strong>
+    </td>
+  </tr>
+</table>

@@ -30,9 +30,9 @@
       <h2>Bejelentkezés</h2>
       <form id="loginForm" class="card">
         <label for="username">Felhasználónév</label>
-        <input type="text" id="username" placeholder="Felhasználónév" required>
+        <input type="text" id="username" placeholder="Felhasználónév" autocomplete="username" required>
         <label for="password">Jelszó</label>
-        <input type="password" id="password" placeholder="Jelszó" required>
+        <input type="password" id="password" placeholder="Jelszó" autocomplete="current-password" required>
         <button type="submit">Belépés</button>
       </form>
     </section>
@@ -76,12 +76,6 @@
         <input type="text" name="serialNumber" id="serialNumber" required>
         <label for="note">Megjegyzés</label>
         <textarea name="note" id="note"></textarea>
-        <label for="status">Státusz</label>
-        <input type="text" name="status" id="status" required>
-        <label for="technician">Szerelő</label>
-        <input type="text" name="technician" id="technician" required>
-        <label for="invoice">Számla</label>
-        <input type="text" name="invoice" id="invoice" required>
         <button type="submit">Mentés</button>
       </form>
     </section>
@@ -99,6 +93,9 @@
     <p>&copy; 2025 Netget Szerviz</p>
   </footer>
 
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+  
   <script src="app.js"></script>
 </body>
 </html>

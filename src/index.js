@@ -1,5 +1,4 @@
 import config from "./config.js";
-
 import app from "./server.js";
 
 const PORT = process.env.PORT || 3000;
