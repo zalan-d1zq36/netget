@@ -23,7 +23,7 @@ app.use(helmet({
             // Temporarily allow unsafe-inline for compatibility - should use nonces in production
             styleSrc: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:"],
-            connectSrc: ["'self'", "blob:"],
+            connectSrc: ["'self'", "blob:", "data:"],
             fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],

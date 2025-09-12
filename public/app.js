@@ -7,8 +7,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 let token = null;
 let currentUser = null;
 let tokenCheckInterval = null;
-
-// Notification System
 class NotificationManager {
     constructor() {
         this.container = document.getElementById('toast-container');
@@ -76,7 +74,6 @@ class NotificationManager {
     }
 }
 
-// Form Validation Utilities
 class ValidationUtils {
     static isEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -84,7 +81,6 @@ class ValidationUtils {
     }
     
     static isPhoneNumber(phone) {
-        // Hungarian phone number format
         const phoneRegex = /^(\+36|06)?[1-9][0-9]{7,8}$/;
         return phoneRegex.test(phone.replace(/[\s-]/g, ''));
     }
@@ -132,8 +128,13 @@ class FieldValidator {
         if (!this.field.parentElement.classList.contains('form-group')) {
             const wrapper = document.createElement('div');
             wrapper.className = 'form-group';
-            this.field.parentElement.insertBefore(wrapper, this.field);
-            wrapper.appendChild(this.field.previousElementSibling); // Move label
+            const parent = this.field.parentElement;
+            const label = this.field.previousElementSibling;
+            
+            parent.insertBefore(wrapper, this.field);
+            if (label && label.tagName === 'LABEL') {
+                wrapper.appendChild(label);
+            }
             wrapper.appendChild(this.field);
         }
         
@@ -261,6 +262,13 @@ document.querySelectorAll("#menu a").forEach(link => {
     link.classList.add("active");
     document.querySelectorAll("main section").forEach(sec => sec.style.display = "none");
     document.getElementById(link.dataset.section).style.display = "block";
+    
+    if (link.dataset.section === "loginSection") {
+      document.body.classList.add('login-active');
+    } else {
+      document.body.classList.remove('login-active');
+    }
+    
     if (link.dataset.section === "databaseSection") {
       if (canViewDatabase()) {
         loadOrders();
@@ -296,14 +304,14 @@ loginForm.addEventListener("submit", async (e) => {
         logoutBtn.style.display = "inline-block";
 
         // Hide login menu after successful login, show other menus
-        document.querySelector('[data-section="loginSection"]').style.display = "none";
-        document.querySelector('[data-section="orderSection"]').style.display = "inline";
+        document.querySelector('[data-section="loginSection"]').parentElement.style.display = "none";
+        document.querySelector('[data-section="orderSection"]').parentElement.style.display = "list-item";
         
         // Show database section for admins and employees
         if (canViewDatabase()) {
-          document.querySelector('[data-section="databaseSection"]').style.display = "inline";
+          document.querySelector('[data-section="databaseSection"]').parentElement.style.display = "list-item";
         } else {
-          document.querySelector('[data-section="databaseSection"]').style.display = "none";
+          document.querySelector('[data-section="databaseSection"]').parentElement.style.display = "none";
         }
         
         // Setup role-based form field visibility
@@ -331,9 +339,6 @@ function resetToLoginState() {
   token = null;
   currentUser = null;
   
-  // Add login-active class to body for proper styling
-  document.body.classList.add('login-active');
-  
   // Reset all forms properly
   loginForm.reset();
   orderForm.reset();
@@ -351,9 +356,9 @@ function resetToLoginState() {
   document.getElementById("databaseSection").style.display = "none";
   
   // Reset menu visibility - only show login menu item
-  document.querySelector('[data-section="loginSection"]').style.display = "inline";
-  document.querySelector('[data-section="orderSection"]').style.display = "none";
-  document.querySelector('[data-section="databaseSection"]').style.display = "none";
+  document.querySelector('[data-section="loginSection"]').parentElement.style.display = "list-item";
+  document.querySelector('[data-section="orderSection"]').parentElement.style.display = "none";
+  document.querySelector('[data-section="databaseSection"]').parentElement.style.display = "none";
   
   // Reset menu active state
   document.querySelectorAll("#menu a").forEach(l => l.classList.remove("active"));
@@ -367,6 +372,12 @@ function resetToLoginState() {
   
   // Reset role-based form fields
   resetFormFieldVisibility();
+  
+  // Force add login-active class to body for proper centering - do this last
+  document.body.classList.remove('login-active');
+  // Force a repaint by triggering layout
+  document.body.offsetHeight;
+  document.body.classList.add('login-active');
 }
 
 // LOGOUT
@@ -708,14 +719,9 @@ async function deleteOrderPrompt(orderId) {
   }
 }
 
-// Role-based form field management (these fields are no longer in the form)
-function setupRoleBasedFormFields() {
-  // No longer needed since status, technician, invoice fields are removed from form
-}
+function setupRoleBasedFormFields() {}
 
-function resetFormFieldVisibility() {
-  // No longer needed since status, technician, invoice fields are removed from form
-}
+function resetFormFieldVisibility() {}
 
 // Create pagination controls
 function createPaginationControls(pagination) {
@@ -899,29 +905,9 @@ function initializeFormValidation() {
   }
 }
 
-// TODO: Email küldés fejlesztendő funkciók:
-// TODO: 1. Modal ablak létrehozása címzett adatainak megadásához
-// TODO: 2. Email cím validáció a frontend-en
-// TODO: 3. Email template előnézet a modal-ban
-// TODO: 4. Megerősítés küldés előtt
-// TODO: 5. Loading state a küldés alatt
-
-// Email sending function - JELENLEG EGYSZERŰSÍTETT VÁLTOZAT
 async function sendOrderEmail(orderId) {
-  // TODO: Itt kell megnyitni egy modal ablakot a következő mezőkkel:
-  // - Címzett neve (text input)
-  // - Címzett email címe (email input, validációval)
-  // - Email template előnézet (readonly textarea)
-  // - Küldés és Mégse gombok
-  
   try {
     notify.info('Email küldése...');
-    
-    // TODO: Itt kell elküldeni a címzett adatait is:
-    // const emailData = {
-    //   recipientName: 'Címzett neve a modal-ból',
-    //   recipientEmail: 'email@example.com'
-    // };
     
     const response = await fetch(`/api/email/send-order/${orderId}`, {
       method: 'POST',
@@ -929,7 +915,6 @@ async function sendOrderEmail(orderId) {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
-      // TODO: body: JSON.stringify(emailData)
     });
     
     const result = await response.json();
@@ -946,12 +931,6 @@ async function sendOrderEmail(orderId) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-  // Add login-active class initially
-  document.body.classList.add('login-active');
-  
-  // Ensure proper initial state
-  resetToLoginState();
-  
   // Initialize form validation after a short delay to ensure DOM is ready
   setTimeout(initializeFormValidation, 100);
 });
