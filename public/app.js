@@ -286,13 +286,17 @@ loginForm.addEventListener("submit", async (e) => {
     if (data.success) {
         token = data.token;
         currentUser = data.user; // Store full user object with role
+        
+        // Remove login-active class from body
+        document.body.classList.remove('login-active');
+        
         notify.success(`Sikeres belépés! Üdvözöljük, ${currentUser.name}!`);
         loginForm.style.display = "none";
         orderSection.style.display = "block";
         logoutBtn.style.display = "inline-block";
 
-        // Always show menu links after login
-        document.querySelector('[data-section="loginSection"]').style.display = "inline";
+        // Hide login menu after successful login, show other menus
+        document.querySelector('[data-section="loginSection"]').style.display = "none";
         document.querySelector('[data-section="orderSection"]').style.display = "inline";
         
         // Show database section for admins and employees
@@ -326,6 +330,9 @@ function resetToLoginState() {
   // Clear authentication data
   token = null;
   currentUser = null;
+  
+  // Add login-active class to body for proper styling
+  document.body.classList.add('login-active');
   
   // Reset all forms properly
   loginForm.reset();
@@ -514,25 +521,25 @@ function renderOrders(orders, pagination) {
         
         // Offer PDF
         const offerBtn = document.createElement('button');
-        offerBtn.textContent = '📄 Árajánlat';
+        offerBtn.textContent = 'Árajánlat';
         offerBtn.className = 'pdf-menu-item';
         offerBtn.onclick = () => generatePDF(order.id, 'offer');
         
         // Worksheet PDF
         const worksheetBtn = document.createElement('button');
-        worksheetBtn.textContent = '📋 Munkalap';
+        worksheetBtn.textContent = 'Munkalap';
         worksheetBtn.className = 'pdf-menu-item';
         worksheetBtn.onclick = () => generatePDF(order.id, 'worksheet');
         
         // Kiadni PDF 
         const kiadniBtn = document.createElement('button');
-        kiadniBtn.textContent = '📋 Kiadni';
+        kiadniBtn.textContent = 'Kiadni';
         kiadniBtn.className = 'pdf-menu-item';
         kiadniBtn.onclick = () => generatePDF(order.id, 'kiadni');
         
         // Invoice PDF
         const invoiceBtn = document.createElement('button');
-        invoiceBtn.textContent = '🧾 Számla';
+        invoiceBtn.textContent = 'Számla';
         invoiceBtn.className = 'pdf-menu-item';
         invoiceBtn.onclick = () => generatePDF(order.id, 'invoice');
         
@@ -550,7 +557,7 @@ function renderOrders(orders, pagination) {
       // Add email send button
       if (canManageOrders()) {
         const emailBtn = document.createElement('button');
-        emailBtn.textContent = '📧 Email küldés';
+        emailBtn.textContent = 'Email küldés';
         emailBtn.className = 'btn-email';
         emailBtn.style.marginTop = '8px';
         emailBtn.onclick = () => sendOrderEmail(order.id);
@@ -939,6 +946,9 @@ async function sendOrderEmail(orderId) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+  // Add login-active class initially
+  document.body.classList.add('login-active');
+  
   // Ensure proper initial state
   resetToLoginState();
   

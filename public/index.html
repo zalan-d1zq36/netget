@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Netget Rendeléskezelő</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" href="netget.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,16 +27,24 @@
   <!-- Tartalom -->
   <main>
     <!-- Login -->
-    <section id="loginSection" class="centered">
-      <img src="netget.png" alt="Netget logó" class="big-logo">
-      <h2>Bejelentkezés</h2>
-      <form id="loginForm" class="card">
-        <label for="username">Felhasználónév</label>
-        <input type="text" id="username" placeholder="Felhasználónév" autocomplete="username" required>
-        <label for="password">Jelszó</label>
-        <input type="password" id="password" placeholder="Jelszó" autocomplete="current-password" required>
-        <button type="submit">Belépés</button>
-      </form>
+    <section id="loginSection" class="login-page">
+      <div class="login-card">
+        <div class="brand-logo">
+          <img src="netget.png" alt="Netget logó">
+        </div>
+        <h1 class="login-title">Bejelentkezés</h1>
+        <form id="loginForm" class="login-form">
+          <div class="form-field">
+            <label for="username">Felhasználónév</label>
+            <input type="text" id="username" placeholder="Írja be a felhasználónevet" autocomplete="username" required>
+          </div>
+          <div class="form-field">
+            <label for="password">Jelszó</label>
+            <input type="password" id="password" placeholder="Írja be a jelszót" autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="login-button">Belépés</button>
+        </form>
+      </div>
     </section>
 
     <section id="orderSection" style="display:none;">
@@ -90,7 +100,7 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 Netget Szerviz</p>
+    <p>&copy; 2025 Netget Kft.</p>
   </footer>
 
   <!-- Toast Notification Container -->
