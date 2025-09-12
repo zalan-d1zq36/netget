@@ -1,17 +1,16 @@
 # Netget Szerviz Rendszer - Deployment Útmutató
 
-## 🚀 Ajánlott Deployment Opciók
 
-### 1️⃣ Railway.app (⭐ AJÁNLOTT KEZDŐKNEK)
+### Railway.app
 
 **Miért Railway?**
-- ✅ 5 perc alatt működik
-- ✅ Automatikus HTTPS
-- ✅ GitHub integration
-- ✅ Ingyenes kezdés, $5/hónap után
-- ✅ Beépített adatbázis támogatás
+- 5 perc alatt működik
+- Automatikus HTTPS
+- GitHub integration
+- Ingyenes kezdés, $5/hónap után
+- Beépített adatbázis támogatás
 
-**Lépés-by-lépés:**
+**Lépésről lépésre:**
 
 1. **GitHub repository előkészítése:**
 ```bash
@@ -52,64 +51,14 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-gmail-app-password
-RECEIVER_EMAIL=rendeles@netget.hu
+RECEIVER_EMAIL=receiver@netget.hu
 ```
 
 5. **Domain beállítás:**
 - Settings → Networking → Generate Domain
 - Kapni fogsz egy URL-t: `https://xyz.up.railway.app`
 
-**🎉 KÉSZ! Az alkalmazásod már elérhető az interneten!**
-
----
-
-### 2️⃣ Render.com (Teljesen ingyenes)
-
-**Előnyök:**
-- ✅ 100% ingyenes tier
-- ✅ Automatikus HTTPS
-- ⚠️ 15 perc után "alvó" módba kerül (első kérésre újraindul)
-
-**Lépések:**
-1. [render.com](https://render.com) → Sign up with GitHub
-2. "New Web Service" → Connect GitHub repo
-3. Beállítások:
-   ```
-   Name: netget-szerviz
-   Environment: Node
-   Build Command: npm install
-   Start Command: npm start
-   Instance Type: Free
-   ```
-4. Environment Variables → ugyanazokat add hozzá mint Railway-nél
-
----
-
-### 3️⃣ DigitalOcean VPS (Haladó felhasználóknak)
-
-**Ha teljes kontrollt szeretnél:** $4/hónap, de kézi beállítás
-
-```bash
-# VPS-re való telepítés script
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source ~/.bashrc
-nvm install 20
-nvm use 20
-
-# Alkalmazás telepítése
-git clone https://github.com/FELHASZNALONEV/netget-szerviz.git
-cd netget-szerviz
-npm install --production
-
-# PM2 process manager
-npm install -g pm2
-cp .env.example .env
-# Szerkeszd a .env fájlt
-
-pm2 start src/index.js --name netget
-pm2 startup
-pm2 save
-```
+**Kész!**
 
 ---
 
@@ -127,10 +76,10 @@ NODE_ENV=production npm start
 ```
 
 ### 3. Biztonság ellenőrzése
-- ✅ JWT_SECRET legalább 32 karakter
-- ✅ Erős admin jelszó
-- ✅ HTTPS használat éles környezetben
-- ✅ CORS beállítások
+- JWT_SECRET legalább 32 karakter
+- Erős admin jelszó
+- HTTPS használat éles környezetben
+- CORS beállítások
 
 ---
 
@@ -165,7 +114,7 @@ cp orders.db backups/orders_$DATE.db
 
 ---
 
-## 🚨 Deployment Checklist
+## Deployment Checklist
 
 **Deployment előtt:**
 - [ ] Git repository létrehozva és pusholt
@@ -179,31 +128,3 @@ cp orders.db backups/orders_$DATE.db
 - [ ] PDF generálás működik
 - [ ] Email küldés működik (ha beállítottad)
 - [ ] HTTPS aktív
-
----
-
-## 🎯 Az én ajánlásom:
-
-**Kezdd Railway-jel!** 🚀
-
-Miért?
-- 5 perc alatt működik
-- Automatikus minden (HTTPS, deployment)
-- $5/hónap után sem drága
-- Később könnyen migálhatsz
-
-**Következő lépés:**
-1. GitHub repo létrehozása
-2. Railway regisztráció
-3. Projekt összekapcsolása
-4. Environment változók beállítása
-5. **PROFIT!** 🎉
-
----
-
-## ❓ Segítségre van szükséged?
-
-Ha elakadnál:
-1. Nézd meg a Railway/Render dokumentációt
-2. Ellenőrizd a logs-okat (Dashboard → Logs)
-3. Kérdezz, ha valamit nem értesz!
